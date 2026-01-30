@@ -1,0 +1,102 @@
+server:
+  port: 6000 # Gateway listens on port 6000 - SINGLE ENTRY POINT
+
+auth:
+  service:
+    url: http://localhost:6001
+
+jwt:
+  secret: ${JWT_SECRET:-your-256-bit-secret-key-here-must-be-at-least-32-characters-long-for-security}
+
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+              - "http://127.0.0.1:5173"
+              - "http://127.0.0.1:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        # Auth Service - No JWT validation needed
+        - id: auth-service
+          uri: http://localhost:6001
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0
+
+        # User Service - JWT validation required
+        - id: user-service
+          uri: http://localhost:6002
+          predicates:
+            - Path=/users/**
+          filters:
+            - JwtValidation
+            - StripPrefix=0
+
+        # Resource Service - JWT validation required (read access for all authenticated users)
+        - id: resource-service
+          uri: http://localhost:6003
+          predicates:
+            - Path=/resources/**
+          filters:
+            - JwtValidation
+            - StripPrefix=0
+
+        # Resource Service Management - Requires Resource Manager role
+        # Note: Role-based access is enforced at service level via filters
+        - id: resource-service-manager
+          uri: http://localhost:6003
+          predicates:
+            - Path=/resources/manage/**
+          filters:
+            - JwtValidation
+            - StripPrefix=0
+
+        # Booking Service - JWT validation required
+        - id: booking-service
+          uri: http://localhost:6004
+          predicates:
+            - Path=/bookings/**
+          filters:
+            - JwtValidation
+            - StripPrefix=0
+
+        # Swagger/OpenAPI Documentation Routes
+        - id: api-docs-auth
+          uri: http://localhost:6001
+          predicates:
+            - Path=/api-docs/auth
+          filters:
+            - RewritePath=/api-docs/auth, /v3/api-docs
+
+        - id: api-docs-user
+          uri: http://localhost:6002
+          predicates:
+            - Path=/api-docs/user
+          filters:
+            - RewritePath=/api-docs/user, /v3/api-docs
+
+        - id: api-docs-resource
+          uri: http://localhost:6003
+          predicates:
+            - Path=/api-docs/resource
+          filters:
+            - RewritePath=/api-docs/resource, /v3/api-docs
+
+        - id: api-docs-booking
+          uri: http://localhost:6004
+          predicates:
+            - Path=/api-docs/booking
+          filters:
+            - RewritePath=/api-docs/booking, /v3/api-docs
