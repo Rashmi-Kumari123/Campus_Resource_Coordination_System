@@ -147,6 +147,13 @@ input, select, textarea {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(13, 115, 119, 0.3);
 }
+.form-group input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.form-group input[type="date"]::-webkit-calendar-picker-indicator,
+.form-group input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.85;
+  cursor: pointer;
+}
 
 .table-wrap {
   overflow-x: auto;
