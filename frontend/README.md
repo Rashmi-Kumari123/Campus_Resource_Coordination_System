@@ -12,26 +12,14 @@ React (Vite + TypeScript) UI for the Campus Resource Coordination System. Role-b
 2. **Configure API URL**
    - Copy `.env.example` to `.env`
    - Set `VITE_API_BASE_URL` to your API Gateway URL (default: `http://localhost:6000`)
+ 
 
-3. **Start the backend** (required before login/signup)
-   - From the **project root** (not `frontend/`), start the API Gateway and services:
-   ```bash
-   docker-compose up -d
-   ```
-   Or run the API Gateway and auth-service locally (see main [README](../README.md)).
-   - Check that the gateway is up: open `http://localhost:6000` in the browser or run:
-   ```bash
-   curl -s -o /dev/null -w "%{http_code}" http://localhost:6000/auth/login -X POST -H "Content-Type: application/json" -d "{}"
-   ```
-   Any response (e.g. 400/401) means the gateway is reachable.
-
-4. **Run development server**
+3**Run development server**
    ```bash
    npm run dev
    ```
    App runs at `http://localhost:5173` (or next available port).
 
-## "Cannot reach the API at http://localhost:6000"
 
 In **development**, the app uses a **Vite proxy**: requests to `/auth`, `/users`, `/resources`, `/bookings` are sent to the same origin (localhost:5173), and Vite forwards them to the API Gateway (localhost:6000). So **CORS is not used** in dev and this error should not appear if the gateway is up.
 

@@ -7,6 +7,34 @@ A microservices-based platform for managing campus resources (rooms, labs, equip
 
 ---
 
+## High-Level Description
+
+### This project solves below problem.
+
+Campuses (universities, colleges, institutions) need a single place to **discover, book, and manage shared resources** such as rooms, labs, halls, and equipment. Today, this is often done via spreadsheets, email, or scattered tools, leading to double-booking, no visibility into availability, and no automated reminders. The problem is: **how to coordinate campus resources in one system** so that users can see what is available, request or confirm bookings, and get notified—while staff can manage resources and approve requests according to roles.
+
+### Solution for above problem
+
+CRCS is a **microservices-based platform** that centralizes resource and booking management:
+
+1. **Users** sign up or log in (JWT-based auth), then browse available resources, create booking requests, and manage their own bookings. They receive **email notifications** (e.g. booking confirmed or cancelled) via Kafka and the notification service.
+2. **Resource and facility managers** create and maintain resources (rooms, labs, equipment) and their status. **Facility managers and admins** approve or reject pending bookings; once approved, the booking is confirmed and the user is notified.
+3. All traffic goes through an **API Gateway** that validates JWTs and applies **role-based access** (USER, RESOURCE_MANAGER, FACILITY_MANAGER, ADMIN). Backend services (auth, user, resource, booking, notification) run independently and communicate via REST and Kafka (e.g. topic `CRCS-notification` for notification events).
+4. A **React frontend** (Vite + TypeScript) provides a landing page, login/signup, dashboard, resource browsing, booking creation, and (for managers) resource management and pending-booking approval. The UI reflects the user’s role and shows success feedback (e.g. “Booking created successfully”) where appropriate.
+
+End-to-end: signup → login → browse resources → create booking → (optional) approval → confirmation/cancellation and email notification. See [VISUAL_WORKFLOW.md](VISUAL_WORKFLOW.md) for flow diagrams.
+
+### Assumptions this project made
+
+- **Single campus / single tenant**: The system is designed for one institution; multi-tenant or multi-campus separation is not assumed.
+- **Email as the notification channel**: Notifications are sent by email (SMTP). Other channels (SMS, in-app only) are not assumed.
+- **Human approval for bookings**: Bookings can be in PENDING state until a FACILITY_MANAGER or ADMIN approves them; auto-approval or different approval rules are not assumed.
+- **MySQL and Kafka are available**: Backend services assume MySQL for persistence and Kafka for event-driven notifications; no fallback to other message or DB systems.
+- **JWT and API Gateway**: All protected API calls are assumed to go through the gateway with a valid JWT; direct service-to-browser calls are not the primary use case.
+- **Standard roles**: The four roles (USER, RESOURCE_MANAGER, FACILITY_MANAGER, ADMIN) and their permissions are fixed; custom or configurable roles are not assumed.
+
+---
+
 ### Project Structure
 
 ```
