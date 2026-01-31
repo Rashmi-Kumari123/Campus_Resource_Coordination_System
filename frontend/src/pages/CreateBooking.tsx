@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { resourcesApi } from '../api/resources';
 import { bookingsApi } from '../api/bookings';
@@ -14,20 +14,12 @@ export function CreateBooking() {
   const [purpose, setPurpose] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     resourcesApi
       .getAvailable({ page: 0, size: 100 })
       .then((res) => setResources(res.content))
       .catch((err) => setError(getApiErrorMessage(err)));
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (navigateTimeoutRef.current) clearTimeout(navigateTimeoutRef.current);
-    };
   }, []);
 
   const toISO = (local: string) =>
@@ -48,10 +40,7 @@ export function CreateBooking() {
         endTime: toISO(endTime),
         purpose: purpose || undefined,
       });
-      setSuccessMessage('Booking created successfully');
-      navigateTimeoutRef.current = setTimeout(() => {
-        navigate('/bookings');
-      }, 2000);
+      navigate('/bookings');
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -61,11 +50,6 @@ export function CreateBooking() {
 
   return (
     <div>
-      {successMessage && (
-        <div className="toast toast-success" role="status" aria-live="polite">
-          {successMessage}
-        </div>
-      )}
       <div className="page-header">
         <h1>New booking</h1>
         <p>
