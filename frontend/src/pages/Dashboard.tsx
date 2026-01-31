@@ -27,7 +27,7 @@ export function Dashboard() {
   }, [user?.userId]);
 
   return (
-    <div>
+    <div className="dashboard-page">
       <div className="page-header">
         <h1>Dashboard</h1>
         <p>Welcome back, {user?.name || user?.email}. Role: {user?.role}</p>

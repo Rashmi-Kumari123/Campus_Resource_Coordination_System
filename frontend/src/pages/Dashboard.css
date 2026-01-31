@@ -1,7 +1,19 @@
+.dashboard-page {
+  width: 100%;
+  max-width: 100%;
+}
+
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 1.5rem;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .dashboard-card h3 {
