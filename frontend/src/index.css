@@ -226,3 +226,32 @@ tr:hover td {
   color: var(--success);
   border: 1px solid var(--accent);
 }
+
+/* Toast: fixed top-right success/notification message */
+.toast {
+  position: fixed;
+  top: 4.5rem; /* below navbar with gap */
+  right: 1.5rem;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: toast-in 0.25s ease-out;
+}
+.toast-success {
+  background: rgba(20, 255, 236, 0.2);
+  color: var(--success);
+  border: 1px solid var(--accent);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
