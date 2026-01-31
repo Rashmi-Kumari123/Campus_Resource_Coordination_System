@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { resourcesApi } from '../api/resources';
 import { useAuth } from '../context/AuthContext';
@@ -20,6 +20,8 @@ export function ResourceForm() {
   const [responsiblePerson, setResponsiblePerson] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const navigateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -35,6 +37,12 @@ export function ResourceForm() {
       })
       .catch((err) => setError(getApiErrorMessage(err)));
   }, [id, isEdit]);
+
+  useEffect(() => {
+    return () => {
+      if (navigateTimeoutRef.current) clearTimeout(navigateTimeoutRef.current);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,10 +65,16 @@ export function ResourceForm() {
           location: body.location,
           capacity: body.capacity,
         });
-        navigate(`/resources/${id}`);
+        setSuccessMessage('Resource updated successfully');
+        navigateTimeoutRef.current = setTimeout(() => {
+          navigate(`/resources/${id}`);
+        }, 2000);
       } else {
         const created = await resourcesApi.create(body);
-        navigate(`/resources/${created.id}`);
+        setSuccessMessage('Resource created successfully');
+        navigateTimeoutRef.current = setTimeout(() => {
+          navigate(`/resources/${created.id}`);
+        }, 2000);
       }
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -71,6 +85,11 @@ export function ResourceForm() {
 
   return (
     <div>
+      {successMessage && (
+        <div className="toast toast-success" role="status" aria-live="polite">
+          {successMessage}
+        </div>
+      )}
       <div className="page-header">
         <h1>{isEdit ? 'Edit resource' : 'Add resource'}</h1>
         <p>
